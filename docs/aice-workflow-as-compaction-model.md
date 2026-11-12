@@ -191,7 +191,7 @@ For the compaction reading: a compressed handoff that rebuilds custody from the 
 
 ## 11. Stopping conditions and verdicts
 
-Carried from the [companion file](./eev4-compaction-audit-formalization.md), section 7: void the run on a hash mismatch, key leakage into any input, a changed model pin, or compaction not forced at FC1 or FC2; rerun a no-response session once and count a second failure as a fail; analyze once, with no peeking and no added traces; verdicts PASS_PILOT, FAIL_PILOT, NO_VERDICT and HELD_PARTIAL, as recommendations only. If FC3 is run, the stale-token rule (single use) is frozen before the run, because the repo's stale trial passes under a MAC-only verifier.
+Carried from the [companion file](./eev4-compaction-audit-formalization.md), section 7: void the run on a hash mismatch, key leakage into any input, a changed model pin, or compaction not forced at FC1 or FC2; rerun a no-response session once and count a second failure as a fail; analyze once, with no peeking and no added traces; per-model verdicts PASS_PILOT, FAIL_PILOT and NO_VERDICT, with HELD_PARTIAL as the overall label for a split, all as recommendations only; negative and positive controls, stable source IDs in every condition, a fresh CP2 branch and a stated multiplicity rule are required (see the companion file). If FC3 is run, the stale-token rule (single use) is frozen before the run, because the repo's stale trial passes under a MAC-only verifier.
 
 ## 12. What stays owed
 

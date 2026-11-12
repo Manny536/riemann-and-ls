@@ -52,6 +52,8 @@ Separation rules:
   | f_E: permitted action | Enforceability |
   | f_R: correction or revocation ID | Retention |
 - **Session** σ = (model m, trace τ, condition c, session index j). Fresh context each time.
+- **CP2 context (fixed, per AIce review):** CP2 runs as a fresh branch from the compacted state after r1. The model's own CP1 answer is not carried forward into CP2 input, so a CP1 answer cannot be copied into CP2. Any carry-forward variant is a separate, labelled condition and is not part of the pilot.
+- **Stable source IDs in every condition (per AIce review):** c0, k1, r1, u1, a1, a2 and b1, and all evidence IDs, appear verbatim in every condition's input, C1 included. Otherwise C1 fails f_A and f_V trivially because the IDs were never given, and H1 would measure ID deletion, not compaction quality.
 - **Scorer:** a deterministic exact-match function comparing structured output to K(τ). No model is the primary scorer.
 
 ## 3. Pass rules
@@ -68,6 +70,8 @@ Separation rules:
 - **Pilot rule as written in the source:** gain of at least 10 percentage points over each compacted control on each model, with each interval excluding zero in the positive direction. That is four comparisons (two controls, two models), all of which must hold.
 - **Intervals:** resample the 20 traces with replacement, using the within-trace mean from step 3. Paired by trace across conditions. 95% percentile interval. The number of resamples and the seed are frozen before the first model call (values OWED).
 - **Note on the rule:** an interval that excludes zero shows direction, not a 10-point effect. The point estimate carries the 10-point test and the interval carries the direction test. L reports both separately and never merges them into one number.
+- **Multiplicity (per AIce review):** four intervals are required (H1 and H2 on two models), and all must hold. The pilot either uses Bonferroni-adjusted intervals (98.75% percentile, which is 0.05/4 per comparison), or reports unadjusted 95% intervals with the label UNCORRECTED PILOT. Which one is frozen before the first model call (choice OWED). Because all four must hold, this is an intersection test and the familywise false-pass rate is already at most 5%; the label still has to be stated.
+- **Controls (per AIce review, from the evidence note's step 5):** a negative control and a positive control are required before any verdict. Negative: traces whose added structure is irrelevant (typed records with no correction link and no authority content); C2-style gains there indicate format effects, not custody. Positive: traces with a known, recoverable correction that C0 must pass at or above τ_C0; failure there means the fixture is broken. Missing either control yields NO_VERDICT.
 - **C0 role:** solvability check only, not a comparison control. If a model cannot pass C0 above a frozen floor τ_C0, that model's results are UNINTERPRETABLE. The floor has no default and is OWED. Without a frozen floor the result is NO_VERDICT.
 
 Exploratory (labelled exploratory, never counted toward the pilot pass): field-by-checkpoint breakdown, adopted-unauthorized rate, stale-claim rate (pre-correction claim reported at CP1), revoked-still-active rate (corrected claim reported at CP2), C0 versus compacted gaps, and any model-judge agreement analysis.
@@ -104,17 +108,19 @@ All thresholds below are caller-supplied and frozen before the first model call.
 - S6. Analyze once, after all 480 sessions finish. No interim intervals, no peeking, no adding traces or sessions after seeing any result, no changing thresholds after the first model call.
 - S7. Any analysis choice made after the first model call is labelled post-hoc and exploratory. The prereg states this up front.
 
-**Verdicts per model:**
+**Verdicts per model** (PASS_PILOT, FAIL_PILOT, NO_VERDICT):
 - PASS_PILOT: H1 and H2 both hold for that model.
 - FAIL_PILOT: any of the two comparisons fails with valid data.
 - NO_VERDICT: C0 floor missed or unset; a control at ceiling so a 10-point gain is not attainable; missing frozen thresholds; or exceeded failure cap. Ceiling is NO_VERDICT, not a fail.
-- HELD_PARTIAL: one model passes and the other does not, or one verdict is NO_VERDICT. Both are reported; neither is hidden.
+
+**Overall label:** HELD_PARTIAL is an overall label, not a per-model verdict. It applies when one model passes and the other does not, or one model's verdict is NO_VERDICT. Both per-model verdicts are reported; neither is hidden.
 **Overall:** the source's pilot criterion holds only when both models are PASS_PILOT. Even then the label stays PROPOSED pilot evidence on synthetic traces.
 
 ## 8. What stays owed
 - Pinned Gemini and GPT version identifiers, settings (temperature and other sampling), and token budgets.
 - The 20 frozen traces, prompts, key, scorer, analysis code and their SHA-256 values; keys withheld until the run ends.
 - Checkpoint definitions CP1 and CP2 and the placement of u1; counterbalancing plan.
+- Negative-control and positive-control traces; the multiplicity choice (Bonferroni or UNCORRECTED PILOT).
 - The authority registry R(τ) design and its inclusion in every condition.
 - τ_C0, token tolerance, failure cap, number of resamples, seed.
 - Power or sensitivity analysis for 20 traces and a 10-point effect (not computed).
